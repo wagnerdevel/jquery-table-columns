@@ -21,7 +21,7 @@
 			controllerClass: '',
 			useCookie: true,
 			classPosition: '',
-			tableCookieKey: '',
+			tableCookieKey: 'table-column-plugin',
 			hideColumns: [], // colunas escondidas (1 ... N).
 			callback: null // function (columnPosition, hide) { ... } exec. apos show/hide uma coluna
 		}, options);
