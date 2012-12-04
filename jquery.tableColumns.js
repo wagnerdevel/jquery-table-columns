@@ -15,11 +15,12 @@
 		
 		options = $.extend({
 			controllerClass: '',
-			tableId: '',
 			useCookie: true,
 			hideColumns: [], // colunas escondidas (1 ... N).
 			callback: null // function (columnPosition, hide) { ... } exec. apos show/hide uma coluna
 		}, options);
+		
+		options.tableId = $(this).attr('id');
 		
 		if (options.useCookie && $.cookie('table-column-plugin') != null) {
 			if ($.cookie('table-column-plugin') != "") {
@@ -30,7 +31,6 @@
 		}
 		
 		if (options.hideColumns.length > 0) {
-			console.log(options.hideColumns);
 			for (key in options.hideColumns) {
 				displaying(options.hideColumns[key], true, false);
 			}
@@ -59,7 +59,6 @@
 			}
 			
 			if (options.useCookie && saveCookie) {
-				console.log('saving');
 				$.cookie('table-column-plugin', columns.join(','));
 			}
 		}
