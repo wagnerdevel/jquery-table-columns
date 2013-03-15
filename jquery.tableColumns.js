@@ -12,16 +12,17 @@
  * The MIT License - http://www.opensource.org/licenses/mit-license.php
  */
 
-(function($) {
+;(function($) {
 	$.fn.tableColumns = function(options) {
 		var columns = [];
 		var el = $(this);
+		var restore = false;
 		
 		options = $.extend({
 			controllerClass: '',
 			useCookie: true,
 			classPosition: '',
-			tableCookieKey: 'table-column-plugin',
+			tableCookieKey: 'table-columns-plugin',
 			hideColumns: [], // colunas escondidas (1 ... N).
 			callback: null // function (columnPosition, hide) { ... } exec. apos show/hide uma coluna
 		}, options);
@@ -32,27 +33,33 @@
 			} else {
 				options.hideColumns = [];
 			}
+			
+			restore = true;
 		}
 		
 		if (options.hideColumns.length > 0) {
 			for (key in options.hideColumns) {
-				displaying(options.hideColumns[key], true, false);
+				displaying(options.hideColumns[key], true, restore);
 			}
 		}
 		
-		function displaying(position, hide, saveCookie) {
+		function displaying(position, hide, restore) {
 			var elements = 'td:nth-child('+ position +'), th:nth-child('+ position +')';
 			
 			if (hide === undefined || ! hide) {
 				$(el).find(elements).fadeIn();
 				
-				columns.splice(columns.indexOf(position), 1);
+				columns.splice(getPosition(position), 1);
 				
 				if (options.callback) {
 					options.callback(position, false);
 				}
 			} else {
-				$(el).find(elements).fadeOut();
+				if (restore) {
+					$(el).find(elements).fadeOut(0);
+				} else {
+					$(el).find(elements).fadeOut();
+				}
 				
 				columns.push(position);
 				
@@ -60,10 +67,19 @@
 					options.callback(position, true);
 				}
 			}
-			
-			if (options.useCookie && saveCookie) {
-				$.cookie(options.tableCookieKey, columns.join(','));
+
+			if (options.useCookie && ! restore) {
+				$.cookie(options.tableCookieKey, columns.join(','), {path: '/'});
 			}
+		}
+		
+		function getPosition(columnPosition) {
+			for (k in columns) {
+				if (columns[k] === columnPosition)
+					return k;
+			}
+
+			return -1;
 		}
 		
 		return this.each(function() {
@@ -75,7 +91,9 @@
 				if (position.indexOf(' ') > -1)
 					position = position.substring(0, position.indexOf(' '));
 				
-				displaying(position, (columns.indexOf(position) == -1), true);
+				displaying(position, (getPosition(position) == -1), false);
+
+				return false;
 			});
 		});
 	}
